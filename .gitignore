@@ -44,25 +44,69 @@ desktop.ini
 *.log
 *.bak
 
-# 测试文件（不入库的测试数据）
+# ===== 个人敏感信息（绝不入公开仓库）=====
+
+# 真实简历数据（含姓名/电话/邮箱/学校/实习经历）
+# 仓库中只保留 resume_data.example.json，使用者复制为 resume_data.json 后修改
+resume_data.json
+
+# 网申信息底座（含身份证号/家庭成员/紧急联系人等高度敏感信息）
+application_profile.json
+
+# 网申进度看板数据（用户投递记录）
+applications/apply_tracking.json
+
+# 个人资料（含姓名/电话/求职偏好）
+profile/candidate.md
+profile/preferences.md
+
+# 项目节点文档（含大量个人信息和开发历史，公开版用 README.md 替代）
+PROJECT_NODE.md
+REFACTOR_PLAN.md
+FILE_MAP.md
+
+# ===== 运行时产物（不需要入库，使用者运行后自动生成）=====
+
+# 生成的简历（HTML/PDF/Word）+ 头像
+cv/
+assets/
+
+# 生成的HTML报告
+applications/*.html
+radar/*.html
+oq_answers/
+
+# 采集的岗位数据（运行时抓取，可重新采集）
+radar/*.json
+jobs.json
+jobs_backup*.json
+applications/*.json
+
+# 定制面试题库（含个人经历）
+interview-prep/
+
+# 网申附件材料（含身份证扫描件等）
+attachments/
+
+# 测试数据
 test_*.json
 temp_*.json
 *_test.json
 *测试*.html
+test_roommate/
 
-# 生成的抓取数据（可选，根据需要决定是否版本管理）
-# scraped_*.json
+# 根目录临时文件
+网申雷达.html
+网申附件材料清单.md
 
-# 个人敏感信息
+# ===== 密钥和证书 =====
 *.pem
 *.key
 *.p12
 .env
 config.local.yaml
-# 网申信息底座（含身份证号/家庭成员/紧急联系人等高度敏感信息，绝不入库）
-application_profile.json
 
-# 简历生成的中间文件
+# ===== LaTeX 中间文件 =====
 *.aux
 *.log
 *.out
@@ -70,26 +114,3 @@ application_profile.json
 *.synctex.gz
 *.fls
 *.fdb_latexmk
-
-# 通用性测试工作区（室友外贸简历测试，本地保留但不入库）
-test_roommate/
-
-# 网申附件材料（含身份证扫描件等敏感信息，绝不入库）
-attachments/
-
-# 网申进度看板数据（用户投递记录，不入库）
-applications/apply_tracking.json
-
-# 生成的HTML报告（运行时产物，不入库）
-applications/*.html
-
-# OQ答案存档（不入库）
-oq_answers/
-
-# 网申雷达采集数据（运行时抓取的JSON，不入库）
-radar/*.json
-
-# 根目录临时文件
-网申雷达.html
-网申附件材料清单.md
-radar/*.html

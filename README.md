@@ -37,9 +37,15 @@ pip install pyyaml
 ```
 
 ### 2. 配置个人信息
-编辑 `resume_data.json`，替换为你自己的简历信息（当前为示例数据"张三"）。
+```bash
+# 复制示例简历数据为你的真实数据
+cp resume_data.example.json resume_data.json
+```
+然后编辑 `resume_data.json`，替换为你自己的简历信息（示例为"张三"）。
 
-如需使用网申模块，创建 `application_profile.json`（参考 SOP-011）。
+> `resume_data.json` 已入 `.gitignore`，不会被提交到公开仓库。
+
+如需使用网申模块，创建 `application_profile.json`（参考 SOP-011，同样已入 `.gitignore`）。
 
 ### 3. 生成简历
 ```bash
@@ -69,7 +75,7 @@ python job_search.py campus track report     # 进度看板报告
 
 ```
 ├── job_search.py              # 统一工作流引擎（13命令）
-├── resume_data.json           # 简历数据源（替换为你的信息）
+├── resume_data.example.json   # 简历数据示例（复制为 resume_data.json 后修改）
 ├── config.yaml                # 统一配置
 ├── apply_check.py             # 网申机筛检查（15维度）
 ├── apply_track.py             # 网申进度看板
@@ -109,8 +115,9 @@ help       帮助
 
 ## 安全说明
 
-- `application_profile.json`（含身份证/家人信息）和 `apply_tracking.json`（投递记录）已入 `.gitignore`，不会被提交
-- 简历数据 `resume_data.json` 请替换为你自己的信息后再使用
+- **个人信息不入库**：`resume_data.json`、`application_profile.json`（含身份证/家人信息）、`apply_tracking.json`（投递记录）、`profile/`（个人资料）均已入 `.gitignore`，不会被提交
+- **仓库只含示例数据**：`resume_data.example.json` 为示例数据（张三），使用者复制为 `resume_data.json` 后修改
+- **运行时产物不入库**：生成的简历（`cv/`）、HTML报告、采集的岗位数据均入 `.gitignore`
 - Edge 点填扩展只填不提交，所有提交动作必须人工完成
 - 岗位采集扩展仅被动监听页面请求，不发送任何数据到第三方
 
