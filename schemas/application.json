@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Application",
+  "description": "投递申请记录 - 统一申请归档格式",
+  "type": "object",
+  "required": ["id", "company", "position", "apply_date", "status", "history"],
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "申请记录唯一ID（自增）"
+    },
+    "company": {
+      "type": "string",
+      "description": "公司名称"
+    },
+    "position": {
+      "type": "string",
+      "description": "岗位名称"
+    },
+    "city": {
+      "type": "string",
+      "description": "工作城市"
+    },
+    "apply_date": {
+      "type": "string",
+      "format": "date",
+      "description": "投递日期（YYYY-MM-DD）"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["智联招聘", "BOSS直聘", "前程无忧", "猎聘", "实习僧", "校园招聘", "内推", "其他"],
+      "description": "投递渠道"
+    },
+    "cv_version": {
+      "type": "string",
+      "description": "使用的简历模板版本（如'modern双栏'、'经典单栏'）"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["待投递", "已投递", "笔试中", "面试中", "已offer", "已拒绝", "无回应"],
+      "description": "申请状态"
+    },
+    "salary": {
+      "type": "string",
+      "description": "薪资范围"
+    },
+    "jd_link": {
+      "type": "string",
+      "description": "岗位详情页URL"
+    },
+    "match_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "匹配度评分"
+    },
+    "notes": {
+      "type": "string",
+      "description": "备注信息"
+    },
+    "history": {
+      "type": "array",
+      "description": "状态变更历史",
+      "items": {
+        "type": "object",
+        "required": ["date", "status"],
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "description": "变更日期（YYYY-MM-DD）"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["待投递", "已投递", "笔试中", "面试中", "已offer", "已拒绝", "无回应"],
+            "description": "变更后的状态"
+          },
+          "note": {
+            "type": "string",
+            "description": "变更说明"
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

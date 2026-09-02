@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Job",
+  "description": "招聘岗位数据模型 - 统一岗位库格式",
+  "type": "object",
+  "required": ["id", "company", "position", "source", "job_url", "collected_at"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "岗位唯一ID，格式：{source}_{company}_{position}_{hash}"
+    },
+    "company": {
+      "type": "string",
+      "description": "公司名称"
+    },
+    "position": {
+      "type": "string",
+      "description": "岗位名称"
+    },
+    "city": {
+      "type": "string",
+      "description": "工作城市（纯城市名，不含其他信息）"
+    },
+    "salary": {
+      "type": "string",
+      "description": "薪资范围（原始文本，如'6-9K·14薪'）"
+    },
+    "salary_min": {
+      "type": ["number", "null"],
+      "description": "最低月薪（元）"
+    },
+    "salary_max": {
+      "type": ["number", "null"],
+      "description": "最高月薪（元）"
+    },
+    "education": {
+      "type": "string",
+      "description": "学历要求（如'本科'、'硕士'）"
+    },
+    "experience": {
+      "type": "string",
+      "description": "经验要求（如'经验不限'、'1-3年'）"
+    },
+    "skills": {
+      "type": "array",
+      "description": "专业技能标签（去重后）",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "responsibilities": {
+      "type": "string",
+      "description": "岗位职责（清理后的纯文本）"
+    },
+    "requirements": {
+      "type": "string",
+      "description": "任职要求（清理后的纯文本）"
+    },
+    "benefits": {
+      "type": "array",
+      "description": "福利待遇标签（去重后）",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "jd_text": {
+      "type": "string",
+      "description": "完整JD原文（用于后续解析）"
+    },
+    "company_size": {
+      "type": "string",
+      "description": "公司规模（如'1000-9999人'）"
+    },
+    "company_industry": {
+      "type": "string",
+      "description": "公司行业"
+    },
+    "company_link": {
+      "type": "string",
+      "description": "公司详情页URL（或搜索公司的URL）"
+    },
+    "work_location": {
+      "type": "string",
+      "description": "详细工作地点"
+    },
+    "source": {
+      "type": "string",
+      "enum": ["智联招聘", "BOSS直聘", "前程无忧", "猎聘", "实习僧", "其他"],
+      "description": "数据来源平台"
+    },
+    "job_url": {
+      "type": "string",
+      "description": "岗位详情页URL"
+    },
+    "collected_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "采集时间（ISO 8601格式）"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["待评估", "已评估", "已投递", "已忽略"],
+      "default": "待评估",
+      "description": "岗位状态"
+    },
+    "match_score": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 100,
+      "description": "匹配度评分（0-100）"
+    },
+    "match_detail": {
+      "type": ["object", "null"],
+      "description": "匹配度详情（参考match_result.json）"
+    },
+    "notes": {
+      "type": "string",
+      "description": "用户备注"
+    }
+  },
+  "additionalProperties": false
+}

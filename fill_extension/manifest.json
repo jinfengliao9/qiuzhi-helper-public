@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "网申轻量点填（求职助手）",
+  "version": "1.0.0",
+  "description": "网申时先点页面输入框，再点侧边栏字段，自动填入。纯本地，不上传任何数据。",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "storage"
+  ],
+  "icons": {
+    "128": "icon.svg"
+  }
+}

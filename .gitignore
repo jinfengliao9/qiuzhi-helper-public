@@ -1,0 +1,95 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 临时文件
+*.tmp
+*.temp
+*.log
+*.bak
+
+# 测试文件（不入库的测试数据）
+test_*.json
+temp_*.json
+*_test.json
+*测试*.html
+
+# 生成的抓取数据（可选，根据需要决定是否版本管理）
+# scraped_*.json
+
+# 个人敏感信息
+*.pem
+*.key
+*.p12
+.env
+config.local.yaml
+# 网申信息底座（含身份证号/家庭成员/紧急联系人等高度敏感信息，绝不入库）
+application_profile.json
+
+# 简历生成的中间文件
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# 通用性测试工作区（室友外贸简历测试，本地保留但不入库）
+test_roommate/
+
+# 网申附件材料（含身份证扫描件等敏感信息，绝不入库）
+attachments/
+
+# 网申进度看板数据（用户投递记录，不入库）
+applications/apply_tracking.json
+
+# 生成的HTML报告（运行时产物，不入库）
+applications/*.html
+
+# OQ答案存档（不入库）
+oq_answers/
+
+# 网申雷达采集数据（运行时抓取的JSON，不入库）
+radar/*.json
+
+# 根目录临时文件
+网申雷达.html
+网申附件材料清单.md
+radar/*.html

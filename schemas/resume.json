@@ -1,0 +1,199 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Resume",
+  "description": "简历数据模型 - 用户直接修改此文件，使用中文键名",
+  "type": "object",
+  "required": ["基本信息"],
+  "properties": {
+    "基本信息": {
+      "type": "object",
+      "required": ["name", "phone", "email"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "姓名"
+        },
+        "phone": {
+          "type": "string",
+          "description": "电话"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "邮箱"
+        },
+        "city": {
+          "type": "string",
+          "description": "所在城市"
+        },
+        "job_intention": {
+          "type": "string",
+          "description": "求职意向"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "头像文件名（相对于cv目录）"
+        }
+      },
+      "additionalProperties": false
+    },
+    "教育背景": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["school", "major", "degree", "start_date", "end_date"],
+        "properties": {
+          "school": {
+            "type": "string",
+            "description": "学校名称"
+          },
+          "major": {
+            "type": "string",
+            "description": "专业"
+          },
+          "degree": {
+            "type": "string",
+            "description": "学历（本科/硕士/博士）"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始时间（如2023.09）"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束时间（如2027.06或至今）"
+          },
+          "gpa": {
+            "type": "string",
+            "description": "GPA（可选）"
+          },
+          "courses": {
+            "type": "string",
+            "description": "主修课程（可选）"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "实习经历": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["company", "position", "start_date", "end_date", "description"],
+        "properties": {
+          "company": {
+            "type": "string",
+            "description": "公司名称"
+          },
+          "position": {
+            "type": "string",
+            "description": "岗位名称"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始时间"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束时间"
+          },
+          "city": {
+            "type": "string",
+            "description": "工作城市（可选）"
+          },
+          "description": {
+            "type": "array",
+            "description": "工作描述（每条一个要点）",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "项目经历": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "role", "start_date", "end_date", "description"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "项目名称"
+          },
+          "role": {
+            "type": "string",
+            "description": "担任角色"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "开始时间"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "结束时间"
+          },
+          "description": {
+            "type": "array",
+            "description": "项目描述（每条一个要点）",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "技能清单": {
+      "type": "object",
+      "description": "技能清单，按类别分组",
+      "patternProperties": {
+        "^.+$": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "自我评价": {
+      "type": "array",
+      "description": "自我评价（每条一个要点）",
+      "items": {
+        "type": "string"
+      }
+    },
+    "获奖经历": {
+      "type": "array",
+      "description": "获奖经历（可选）",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "奖项名称"
+          },
+          "date": {
+            "type": "string",
+            "description": "获奖时间"
+          },
+          "level": {
+            "type": "string",
+            "description": "奖项级别（国家级/省级/校级）"
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "证书": {
+      "type": "array",
+      "description": "证书列表（可选）",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "四平台岗位采集器（BOSS直聘+智联招聘+前程无忧+猎聘·求职助手）",
+  "version": "1.4.0",
+  "description": "被动捕获BOSS直聘/智联招聘/前程无忧/猎聘搜索页岗位列表响应，自动累积去重，一键导出JSON。只读取、不主动发请求、不自动投递。",
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.zhipin.com/*",
+        "*://*.zhaopin.com/*",
+        "*://*.51job.com/*",
+        "*://*.liepin.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN",
+      "all_frames": false
+    }
+  ]
+}

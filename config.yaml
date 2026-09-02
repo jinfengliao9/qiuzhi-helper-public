@@ -1,0 +1,331 @@
+# ============================================================
+# 求职工作区配置文件
+# 所有硬编码参数都在此文件中配置，修改后无需改动代码
+# ============================================================
+
+# ============================================================
+# 通用配置
+# ============================================================
+general:
+  # 工作区目录（自动检测，无需修改）
+  workspace_dir: ""
+  # 日志级别：DEBUG / INFO / WARNING / ERROR
+  log_level: "INFO"
+  # 默认语言
+  language: "zh-CN"
+  # 编码
+  encoding: "utf-8"
+
+# ============================================================
+# 路径配置
+# ============================================================
+paths:
+  # 简历数据源
+  resume_data: "resume_data.json"
+  # 岗位库
+  jobs_db: "jobs.json"
+  # 申请记录
+  applications: "applications/applications.json"
+  # 简历输出目录
+  cv_output: "cv/"
+  # 报告输出目录
+  report_output: "applications/"
+  # 面试准备输出目录
+  interview_output: "interview-prep/"
+  # 个人资料目录
+  profile_dir: "profile/"
+  # 模板目录
+  templates_dir: "templates/"
+  # Schema目录
+  schemas_dir: "schemas/"
+  # 工具模块目录
+  utils_dir: "utils/"
+  # 归档目录
+  archive_dir: "archive/"
+
+# ============================================================
+# 抓取配置
+# ============================================================
+scraper:
+  # 默认平台：zhaopin / boss
+  default_platform: "zhaopin"
+  # 默认抓取数量（建议5-20个，太多容易触发风控）
+  default_count: 10
+  # 每个岗位详情页访问间隔（秒）（建议3-5秒，反爬控制）
+  detail_interval: 4
+  # 岗位卡片点击后等待时间（秒）
+  card_click_wait: 3
+  # 滚动加载次数（0表示不滚动）
+  scroll_times: 0
+  # 滚动间隔（秒）
+  scroll_interval: 3
+  # 页面加载等待时间（秒）
+  page_load_wait: 2
+  # 最大抓取数量（防止误操作）
+  max_count: 100
+  # 测试模式：测试模式下只抓取，不合并到岗位库
+  test_mode: false
+  # 输出文件前缀
+  output_prefix: "scraped_jobs"
+
+# ============================================================
+# 平台配置
+# ============================================================
+platforms:
+  zhaopin:
+    name: "智联招聘"
+    # 默认搜索URL（用户可在页面上修改筛选条件）
+    search_url: "https://www.zhaopin.com/jobs?jl=765&pageMode=search&kw=测绘"
+    # 岗位卡片选择器
+    card_selector: ".joblist-box__item, .job-card"
+    # 详情链接选择器
+    detail_selector: "a[href*='jobdetail']"
+    # 公司搜索URL模板
+    company_search_url: "https://sou.zhaopin.com/?jl=763&kw={company}"
+    # 反爬控制参数
+    anti_crawl:
+      detail_interval: 2.2
+      scroll_wait: 0.6
+      job_interval: 1.0
+
+  boss:
+    name: "BOSS直聘"
+    # 默认搜索URL
+    search_url: "https://www.zhipin.com/web/geek/jobs?query=测绘&city=100010000"
+    # 岗位卡片选择器
+    card_selector: ".job-card-box"
+    # 详情链接选择器
+    detail_selector: "a[href*='job_detail']"
+    # 公司搜索URL模板
+    company_search_url: "https://www.zhipin.com/web/geek/jobs?query={company}"
+    # 反爬控制参数
+    anti_crawl:
+      detail_interval: 4.0
+      scroll_interval: 4.0
+      batch_size: 15
+      navigate_to_blank: true
+
+  # 待启动平台（用户注册账号后可启用）
+  qiancheng:
+    name: "前程无忧"
+    enabled: false
+    search_url: ""
+
+  liepin:
+    name: "猎聘"
+    enabled: false
+    search_url: ""
+
+  shixiseng:
+    name: "实习僧"
+    enabled: false
+    search_url: ""
+
+# ============================================================
+# 匹配引擎配置
+# ============================================================
+matching:
+  # 各维度权重（总和应为1.0）
+  weights:
+    tech_match: 0.35        # 技术匹配
+    experience_match: 0.30  # 经验匹配
+    behavior_match: 0.15    # 行为匹配
+    hard_constraints: 0.20  # 硬约束
+
+  # 投递建议阈值
+  thresholds:
+    strong_recommend: 80    # 80分以上：强烈推荐
+    recommend: 65           # 65-79分：推荐
+    can_try: 50             # 50-64分：可以尝试
+    # 50分以下：不太建议
+
+  # 技能匹配配置
+  skills:
+    # 部分匹配的相似度阈值（0-1）
+    partial_match_threshold: 0.6
+    # 同义词映射
+    synonyms:
+      "arcgis": ["arc gis", "esri"]
+      "gis": ["地理信息系统", "地理信息"]
+      "rtk": ["实时动态定位", "gnss rtk"]
+      "全站仪": ["total station", "ts"]
+      "摄影测量": ["photogrammetry", "航测"]
+      "遥感": ["rs", "remote sensing"]
+      "地籍": ["cadastral", "土地确权"]
+      "工程测量": ["engineering survey", "施工测量"]
+
+  # 硬约束配置
+  hard_constraints:
+    # 学历要求是否严格匹配
+    strict_education: false
+    # 经验要求是否严格匹配
+    strict_experience: false
+    # 城市偏好权重
+    city_preference_weight: 0.1
+    # 薪资匹配权重
+    salary_match_weight: 0.1
+
+# ============================================================
+# 报告配置
+# ============================================================
+report:
+  # 报告样式
+  style:
+    # 主色调（深蓝色）
+    primary_color: "#1a365d"
+    # 辅助色（浅蓝色）
+    secondary_color: "#3182ce"
+    # 强调色（金色）
+    accent_color: "#d69e2e"
+    # 成功色（绿色）
+    success_color: "#38a169"
+    # 警告色（橙色）
+    warning_color: "#dd6b20"
+    # 危险色（红色）
+    danger_color: "#e53e3e"
+    # 背景色
+    background_color: "#f7fafc"
+    # 文字颜色
+    text_color: "#2d3748"
+    # 浅色文字
+    text_light: "#718096"
+
+  # 字体配置
+  fonts:
+    family: "'Microsoft YaHei', 'PingFang SC', 'Helvetica Neue', Arial, sans-serif"
+    size_base: "14px"
+    size_small: "12px"
+    size_large: "16px"
+    size_title: "24px"
+
+  # 报告内容配置
+  content:
+    # 是否显示统计栏
+    show_stats: true
+    # 是否显示匹配度环形图
+    show_match_chart: true
+    # 是否显示技能标签
+    show_skills: true
+    # 是否显示JD原文
+    show_jd_text: false
+    # 每个岗位显示的最大描述长度
+    max_description_length: 500
+    # 报告中岗位排序方式：match_score / salary / city / date
+    sort_by: "match_score"
+    # 排序方向：desc / asc
+    sort_order: "desc"
+
+  # 公司链接配置
+  company_link:
+    # 是否使用搜索链接（推荐，因为公司详情页需要ID）
+    use_search_link: true
+    # 链接打开方式：_blank / _self
+    target: "_blank"
+
+# ============================================================
+# 简历配置
+# ============================================================
+resume:
+  # 默认模板列表（用户可选择）
+  templates:
+    - id: "modern_double"
+      name: "现代双栏"
+      enabled: true
+    - id: "classic_single"
+      name: "经典单栏"
+      enabled: true
+    - id: "minimal"
+      name: "极简风格"
+      enabled: true
+    - id: "creative"
+      name: "活泼创意"
+      enabled: true
+
+  # 默认输出格式
+  output:
+    # 是否生成HTML
+    html: true
+    # 是否生成PDF（需要Edge浏览器）
+    pdf: true
+    # 是否生成Word（按需生成）
+    word: false
+    # PDF生成方式：edge / weasyprint / latex
+    pdf_method: "edge"
+
+  # 简历内容配置
+  content:
+    # 一页优先（应届毕业生控制在一页）
+    one_page_preferred: true
+    # 是否包含头像
+    include_avatar: true
+    # 头像文件名
+    avatar_file: "avatar.jpg"
+    # 经历描述使用STAR法则
+    use_star_method: true
+    # 量化成果优先
+    quantify_achievements: true
+    # 关键词匹配（根据JD调整简历）
+    keyword_matching: true
+
+  # 简历质量检查配置
+  quality_check:
+    # 检查页数
+    check_page_count: true
+    # 检查个人信息完整性
+    check_personal_info: true
+    # 检查时间线连贯性
+    check_timeline: true
+    # 检查错别字和语法
+    check_typos: true
+    # 检查STAR法则
+    check_star_method: true
+    # 检查量化成果
+    check_quantification: true
+    # 检查关键词覆盖
+    check_keywords: true
+    # 检查是否有编造内容（人工审核）
+    check_fabrication: true
+
+# ============================================================
+# 面试配置
+# ============================================================
+interview:
+  # 自我介绍时长（分钟）
+  self_intro_duration: 3
+  # 默认面试问题数量
+  default_question_count: 25
+  # 问题分类
+  categories:
+    - "专业知识题"
+    - "软件操作题"
+    - "仪器操作题"
+    - "项目经验题"
+    - "行为面试题"
+  # 是否生成反问环节建议
+  include_questions_to_ask: true
+  # 是否生成面试注意事项
+  include_tips: true
+
+# ============================================================
+# 数据验证配置
+# ============================================================
+validation:
+  # 是否在数据加载时自动验证
+  auto_validate_on_load: true
+  # 是否在数据保存时自动验证
+  auto_validate_on_save: true
+  # 验证失败时的处理方式：warn / error / skip
+  on_validation_failure: "warn"
+  # 是否记录验证日志
+  log_validation: true
+
+# ============================================================
+# 版本配置
+# ============================================================
+version:
+  # 配置文件版本
+  config_version: "1.0.0"
+  # 最低兼容的代码版本
+  min_code_version: "0.2.0"
+  # 最后更新时间
+  last_updated: "2026-08-26"

@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MatchResult",
+  "description": "职位匹配度评估结果 - 统一匹配引擎输出格式",
+  "type": "object",
+  "required": ["match_score", "dimensions", "matched_skills", "missing_skills", "recommendation"],
+  "properties": {
+    "match_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "综合匹配度评分（0-100）"
+    },
+    "dimensions": {
+      "type": "object",
+      "description": "各维度评分",
+      "required": ["tech_match", "experience_match", "behavior_match", "hard_constraints"],
+      "properties": {
+        "tech_match": {
+          "type": "object",
+          "required": ["score", "weight", "detail"],
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "技术匹配评分"
+            },
+            "weight": {
+              "type": "number",
+              "description": "权重（如0.35）"
+            },
+            "detail": {
+              "type": "string",
+              "description": "技术匹配详情说明"
+            }
+          },
+          "additionalProperties": false
+        },
+        "experience_match": {
+          "type": "object",
+          "required": ["score", "weight", "detail"],
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "经验匹配评分"
+            },
+            "weight": {
+              "type": "number",
+              "description": "权重（如0.30）"
+            },
+            "detail": {
+              "type": "string",
+              "description": "经验匹配详情说明"
+            }
+          },
+          "additionalProperties": false
+        },
+        "behavior_match": {
+          "type": "object",
+          "required": ["score", "weight", "detail"],
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "行为匹配评分"
+            },
+            "weight": {
+              "type": "number",
+              "description": "权重（如0.15）"
+            },
+            "detail": {
+              "type": "string",
+              "description": "行为匹配详情说明"
+            }
+          },
+          "additionalProperties": false
+        },
+        "hard_constraints": {
+          "type": "object",
+          "required": ["score", "weight", "detail", "passed"],
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 100,
+              "description": "硬约束评分"
+            },
+            "weight": {
+              "type": "number",
+              "description": "权重（如0.20）"
+            },
+            "detail": {
+              "type": "string",
+              "description": "硬约束详情说明"
+            },
+            "passed": {
+              "type": "boolean",
+              "description": "是否通过硬约束检查"
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      "additionalProperties": false
+    },
+    "matched_skills": {
+      "type": "array",
+      "description": "已匹配的技能列表",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "missing_skills": {
+      "type": "array",
+      "description": "缺失的技能列表",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "highlights": {
+      "type": "array",
+      "description": "匹配亮点",
+      "items": {
+        "type": "string"
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "description": "存在的差距",
+      "items": {
+        "type": "string"
+      }
+    },
+    "recommendation": {
+      "type": "string",
+      "enum": ["强烈推荐", "推荐", "可以尝试", "不太建议"],
+      "description": "投递建议"
+    },
+    "evaluated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "评估时间（ISO 8601格式）"
+    }
+  },
+  "additionalProperties": false
+}
