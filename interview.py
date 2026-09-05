@@ -437,7 +437,10 @@ def main():
 
     company = ''
     position = ''
-    output_dir = os.path.join(workspace, 'interview-prep')
+    jd_text = ''
+    jd_file = ''
+    # 统一输出路径到 applications/03_面试题库/
+    output_dir = os.path.join(workspace, 'applications', '03_面试题库')
 
     args = sys.argv[1:]
     i = 0
@@ -448,17 +451,44 @@ def main():
         elif args[i] == '--position' and i + 1 < len(args):
             position = args[i + 1]
             i += 2
+        elif args[i] == '--jd' and i + 1 < len(args):
+            jd_text = args[i + 1]
+            i += 2
+        elif args[i] == '--jd-file' and i + 1 < len(args):
+            jd_file = args[i + 1]
+            i += 2
         else:
             if os.path.isdir(args[i]):
                 output_dir = args[i]
             i += 1
+    
+    # 读取JD文件
+    if jd_file and os.path.exists(jd_file):
+        print(f'读取JD文件: {jd_file}')
+        with open(jd_file, 'r', encoding='utf-8') as f:
+            jd_text = f.read()
+    
+    # 从JD中提取关键词，增强岗位分析
+    jd_keywords = []
+    if jd_text:
+        print(f'JD文本长度: {len(jd_text)} 字符')
+        # 提取常见技能关键词
+        skill_patterns = ['全站仪', 'GPS', 'RTK', '无人机', '航测', '遥感', 'GIS', 'ArcGIS', 
+                          'CAD', 'CASS', '测绘', '测量', '地籍', '土地', '规划', '数据处理',
+                          'Python', 'SQL', '数据库', '外业', '内业', '成果', '质量']
+        for skill in skill_patterns:
+            if skill.lower() in jd_text.lower():
+                jd_keywords.append(skill)
+        if jd_keywords:
+            print(f'从JD提取到关键词: {", ".join(jd_keywords)}')
 
     if not company or not position:
         print('用法:')
-        print('  python interview.py --company "公司名" --position "岗位名" [输出目录]')
+        print('  python interview.py --company "公司名" --position "岗位名" [--jd "JD文本"] [--jd-file "JD文件路径"] [输出目录]')
         print()
         print('示例:')
         print('  python interview.py --company "示例测绘公司" --position "测绘工程师"')
+        print('  python interview.py --company "中冶沈勘" --position "测绘工程师" --jd-file job.txt')
         sys.exit(1)
 
     # 加载数据
@@ -471,9 +501,16 @@ def main():
     # 分析岗位
     print(f'分析岗位: {company} - {position}')
     analysis = analyze_position(position, company)
+    # 把JD关键词加入到核心技能中（去重）
+    if jd_keywords:
+        for kw in jd_keywords:
+            if kw not in analysis['key_skills']:
+                analysis['key_skills'].append(kw)
     print(f'  岗位类型: {analysis["position_type"]}')
     print(f'  核心技能: {", ".join(analysis["key_skills"])}')
     print(f'  重点方向: {", ".join(analysis["focus_areas"])}')
+    if jd_keywords:
+        print(f'  JD增强: 已加入 {len(jd_keywords)} 个JD关键词')
 
     # 生成自我介绍
     print('生成定制版自我介绍...')

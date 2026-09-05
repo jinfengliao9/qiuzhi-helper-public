@@ -42,19 +42,27 @@ def get_edge_path():
 
 
 def html_to_pdf(html_path, pdf_path):
-    """用Edge无头模式将HTML转PDF"""
+    """用Edge无头模式将HTML转PDF（修复版：新版headless+file协议+绝对路径）"""
     edge_path = get_edge_path()
     if not edge_path:
         print('  未找到Edge浏览器，跳过PDF')
         return False
-    subprocess.run(
-        [edge_path, '--headless', '--disable-gpu', '--no-pdf-header-footer',
-         f'--print-to-pdf={pdf_path}', html_path],
-        capture_output=True, text=True
-    )
-    time.sleep(2)
-    if os.path.exists(pdf_path):
-        size = os.path.getsize(pdf_path) / 1024
+    # 转换为绝对路径和file:// URL
+    html_abs = os.path.abspath(html_path)
+    pdf_abs = os.path.abspath(pdf_path)
+    file_url = "file:///" + html_abs.replace("\\", "/")
+    try:
+        subprocess.run(
+            [edge_path, '--headless=new', '--disable-gpu', '--no-pdf-header-footer',
+             f'--print-to-pdf={pdf_abs}', file_url],
+            capture_output=True, text=True, timeout=30
+        )
+    except subprocess.TimeoutExpired:
+        print('  PDF转换超时')
+        return False
+    time.sleep(3)  # 等待文件写入完成
+    if os.path.exists(pdf_abs):
+        size = os.path.getsize(pdf_abs) / 1024
         print(f'  PDF生成成功 ({size:.1f} KB)')
         return True
     print('  PDF生成失败')

@@ -71,8 +71,9 @@ FILE_MAP.md
 cv/
 assets/
 
-# 生成的HTML报告
+# 生成的HTML报告（含子目录）
 applications/*.html
+applications/*/
 radar/*.html
 oq_answers/
 
@@ -81,6 +82,10 @@ radar/*.json
 jobs.json
 jobs_backup*.json
 applications/*.json
+
+# 归档的测试数据和临时脚本（保留browser_use_legacy有价值代码）
+archive/data/
+archive/scripts/
 
 # 定制面试题库（含个人经历）
 interview-prep/
@@ -98,6 +103,7 @@ test_roommate/
 # 根目录临时文件
 网申雷达.html
 网申附件材料清单.md
+_*.png
 
 # ===== 密钥和证书 =====
 *.pem

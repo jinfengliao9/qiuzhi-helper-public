@@ -18,7 +18,7 @@
     collect         扩展采集JSON生成独立报告（不入库）
     config          配置管理
     validate        数据验证
-    campus          校招网申模块（机筛检查/网申雷达/OQ生成/信息底座）
+    campus          校招网申模块（机筛检查/网申雷达/OQ动态生成+知识库/信息底座/进度看板）
     help            显示帮助信息
 
 示例：
@@ -226,18 +226,63 @@ def cmd_setup(args):
     print_info("完成后可以运行 'python job_search.py resume' 生成简历")
 
 
+def cmd_prepare(args):
+    """一键处理岗位（抓取JD→匹配→简历→OQ→面试题）"""
+    print_banner()
+    print_info("一键处理岗位...")
+    print()
+
+    # 解析步骤
+    only_steps = args.only.split(',') if args.only else None
+    skip_steps = args.skip.split(',') if args.skip else None
+
+    # 调用prepare_pipeline
+    try:
+        from prepare_pipeline import run_pipeline
+        result = run_pipeline(
+            url=args.url or '',
+            jd_text=args.jd_text or '',
+            jd_file=args.jd_file or '',
+            company=args.company or '',
+            job_title=args.job_title or '',
+            only_steps=only_steps,
+            skip_steps=skip_steps,
+        )
+    except Exception as e:
+        print_error(f"流水线执行失败: {e}")
+        import traceback
+        traceback.print_exc()
+        return
+
+
 def cmd_resume(args):
-    """生成简历"""
+    """生成简历（支持--company/--output/--data参数）"""
     print_banner()
     print_info("生成简历...")
     print()
 
-    # 检查简历数据
-    resume_path = os.path.join(WORKSPACE_DIR, "resume_data.json")
+    # 确定简历数据文件
+    resume_path = getattr(args, 'data', None) or os.path.join(WORKSPACE_DIR, "resume_data.json")
     if not os.path.exists(resume_path):
-        print_error("简历数据文件不存在: resume_data.json")
+        print_error(f"简历数据文件不存在: {resume_path}")
         print_info("请先运行 'python job_search.py setup' 初始化个人资料")
         return
+    print_info(f"数据文件: {resume_path}")
+
+    # 确定输出目录
+    output_dir = getattr(args, 'output', None)
+    company = getattr(args, 'company', None)
+    if output_dir:
+        pass  # 用户指定了输出目录，直接使用
+    elif company:
+        # 根据公司名自动创建子文件夹
+        output_dir = os.path.join(WORKSPACE_DIR, "applications", "02_简历", f"{company}_简历")
+        print_info(f"公司: {company}")
+    else:
+        # 默认输出到cv目录
+        output_dir = os.path.join(WORKSPACE_DIR, "cv")
+    print_info(f"输出目录: {output_dir}")
+    print()
 
     # 验证简历数据
     resume_data = load_json_file(resume_path, "简历数据")
@@ -252,9 +297,9 @@ def cmd_resume(args):
     # 调用generate_selected.py生成简历
     try:
         import generate_selected
-        # 临时修改sys.argv，避免generate_selected.main()误读job_search.py的参数
+        # 临时修改sys.argv，传递数据文件和输出目录
         original_argv = sys.argv
-        sys.argv = ['generate_selected.py']
+        sys.argv = ['generate_selected.py', resume_path, output_dir]
         generate_selected.main()
         sys.argv = original_argv
         print_success("简历生成完成！")
@@ -350,12 +395,26 @@ def cmd_interview(args):
     print_info(f"岗位: {position}")
     print()
 
+    # 获取JD参数
+    jd_text = getattr(args, 'jd', '') or ''
+    jd_file = getattr(args, 'jd_file', '') or ''
+    
+    if jd_text:
+        print_info(f"JD文本长度: {len(jd_text)} 字符")
+    if jd_file:
+        print_info(f"JD文件: {jd_file}")
+    
     # 调用interview.py生成面试准备
     try:
         import interview
         # 临时修改sys.argv传递参数
         original_argv = sys.argv
-        sys.argv = ['interview.py', '--company', company, '--position', position]
+        cmd_args = ['interview.py', '--company', company, '--position', position]
+        if jd_text:
+            cmd_args.extend(['--jd', jd_text])
+        if jd_file:
+            cmd_args.extend(['--jd-file', jd_file])
+        sys.argv = cmd_args
         interview.main()
         sys.argv = original_argv
         print_success("面试准备完成！")
@@ -465,23 +524,49 @@ def cmd_campus(args):
             traceback.print_exc()
 
     elif subcommand == 'oq':
-        print_info("开放性问题(OQ)答案生成...")
-        print()
-        try:
-            import oq_generator
-            original_argv = sys.argv
-            oq_args = ['oq_generator.py']
-            oq_sub = getattr(args, 'oq_subcommand', None)
-            if oq_sub:
-                oq_args.append(oq_sub)
-            sys.argv = oq_args
-            oq_generator.main()
-            sys.argv = original_argv
-            print_success("OQ生成完成！")
-        except Exception as e:
-            print_error(f"OQ生成失败: {str(e)}")
-            import traceback
-            traceback.print_exc()
+        oq_sub = getattr(args, 'oq_subcommand', None)
+        if oq_sub == 'kb':
+            # OQ 知识库管理（AI动态生成答案的本地记忆）
+            print_info("OQ 知识库管理...")
+            print()
+            try:
+                import oq_kb
+                original_argv = sys.argv
+                kb_args = ['oq_kb.py']
+                kb_sub = getattr(args, 'kb_subcommand', None)
+                if kb_sub:
+                    kb_args.append(kb_sub)
+                # 透传额外参数
+                extra_args = getattr(args, 'kb_extra_args', []) or []
+                kb_args.extend(extra_args)
+                sys.argv = kb_args
+                oq_kb.main()
+                sys.argv = original_argv
+            except SystemExit:
+                sys.argv = original_argv
+            except Exception as e:
+                print_error(f"OQ知识库操作失败: {str(e)}")
+                import traceback
+                traceback.print_exc()
+        else:
+            # 固定题库预生成（保留，作为高频题基础）
+            print_info("开放性问题(OQ)固定题库生成...")
+            print()
+            try:
+                import oq_generator
+                original_argv = sys.argv
+                oq_args = ['oq_generator.py']
+                if oq_sub:
+                    oq_args.append(oq_sub)
+                sys.argv = oq_args
+                oq_generator.main()
+                sys.argv = original_argv
+                print_success("OQ题库生成完成！")
+                print_info("提示：遇到题库中没有的问题，直接发给AI动态生成，答案会自动存入知识库")
+            except Exception as e:
+                print_error(f"OQ生成失败: {str(e)}")
+                import traceback
+                traceback.print_exc()
 
     elif subcommand == 'profile':
         print_info("网申信息底座摘要...")
@@ -524,7 +609,7 @@ def cmd_campus(args):
 
     else:
         print_error(f"未知的 campus 子命令: {subcommand}")
-        print_info("可用子命令: check / radar / oq / profile")
+        print_info("可用子命令: check / radar / oq(含kb知识库) / profile / track")
 
 
 def cmd_check(args):
@@ -845,8 +930,21 @@ def main():
     # setup命令
     parser_setup = subparsers.add_parser('setup', help='初始化个人资料')
 
+    # prepare命令（一键处理岗位）
+    parser_prepare = subparsers.add_parser('prepare', help='一键处理岗位（抓取JD→匹配→简历→OQ→面试题）')
+    parser_prepare.add_argument('--url', help='岗位URL')
+    parser_prepare.add_argument('--jd-text', help='JD文本')
+    parser_prepare.add_argument('--jd-file', help='JD文件路径')
+    parser_prepare.add_argument('--company', help='公司名')
+    parser_prepare.add_argument('--job-title', help='岗位名')
+    parser_prepare.add_argument('--only', help='只执行指定步骤（逗号分隔，如 fetch,rank,resume）')
+    parser_prepare.add_argument('--skip', help='跳过指定步骤（逗号分隔，如 oq,interview）')
+
     # resume命令
     parser_resume = subparsers.add_parser('resume', help='生成简历')
+    parser_resume.add_argument('--company', help='公司名（自动创建 applications/02_简历/{公司}_简历/ 子文件夹）')
+    parser_resume.add_argument('--output', help='输出目录（优先级高于--company）')
+    parser_resume.add_argument('--data', help='简历数据文件路径（默认 resume_data.json）')
 
     # rank命令
     parser_rank = subparsers.add_parser('rank', help='职位匹配评估')
@@ -861,6 +959,8 @@ def main():
     parser_interview = subparsers.add_parser('interview', help='面试准备')
     parser_interview.add_argument('--company', required=True, help='公司名称')
     parser_interview.add_argument('--position', required=True, help='岗位名称')
+    parser_interview.add_argument('--jd', help='JD文本')
+    parser_interview.add_argument('--jd-file', help='JD文件路径')
 
     # outcome命令
     parser_outcome = subparsers.add_parser('outcome', help='申请归档管理')
@@ -914,10 +1014,30 @@ def main():
     _c_radar = campus_sub.add_parser('radar', help='网申雷达采集+合并报告')
     _c_radar.add_argument('--keyword', default='测绘', help='搜索关键词（默认测绘）')
     _c_radar.add_argument('--pages', type=int, default=2, help='采集页数（默认2）')
-    _c_oq = campus_sub.add_parser('oq', help='开放性问题(OQ)答案生成')
+    _c_oq = campus_sub.add_parser('oq', help='开放性问题(OQ)：固定题库生成 + AI动态生成知识库')
     _oq_sub = _c_oq.add_subparsers(dest='oq_subcommand')
-    _oq_sub.add_parser('list', help='列出支持的OQ问题')
-    _oq_sub.add_parser('gen', help='生成全部OQ答案')
+    _oq_sub.add_parser('list', help='列出固定题库支持的OQ问题')
+    _oq_sub.add_parser('gen', help='生成固定题库全部OQ答案（高频题基础）')
+    # oq kb 子命令：知识库管理
+    _oq_kb = _oq_sub.add_parser('kb', help='OQ知识库管理（AI动态生成答案的本地记忆，list/search/show/add/export/stats）')
+    _kb_sub = _oq_kb.add_subparsers(dest='kb_subcommand')
+    _kb_sub.add_parser('list', help='列出所有知识库答案')
+    _kb_search = _kb_sub.add_parser('search', help='搜索知识库答案')
+    _kb_search.add_argument('keyword', help='搜索关键词')
+    _kb_show = _kb_sub.add_parser('show', help='查看指定答案')
+    _kb_show.add_argument('--company', required=True, help='公司名')
+    _kb_show.add_argument('--qid', required=True, help='题目ID')
+    _kb_add = _kb_sub.add_parser('add', help='手动添加答案到知识库')
+    _kb_add.add_argument('--company', required=True, help='公司名')
+    _kb_add.add_argument('--question', required=True, help='问题')
+    _kb_add.add_argument('--answer', required=True, help='答案')
+    _kb_add.add_argument('--category', default='自定义', help='分类')
+    _kb_export = _kb_sub.add_parser('export', help='导出公司所有答案为Markdown')
+    _kb_export.add_argument('--company', required=True, help='公司名')
+    _kb_export.add_argument('-o', '--output', required=True, help='输出文件路径')
+    _kb_sub.add_parser('stats', help='统计知识库情况')
+    # 透传额外参数（用于 list --company 等）
+    _oq_kb.add_argument('kb_extra_args', nargs='*', help=argparse.SUPPRESS)
     campus_sub.add_parser('profile', help='查看信息底座摘要')
     _c_track = campus_sub.add_parser('track', help='网申进度看板（add/update/list/show/stats/deadline/report）')
     _c_track.add_argument('track_args', nargs='*', help='透传给 apply_track.py 的参数')
@@ -940,6 +1060,8 @@ def main():
     # 执行命令
     if args.command == 'setup':
         cmd_setup(args)
+    elif args.command == 'prepare':
+        cmd_prepare(args)
     elif args.command == 'resume':
         cmd_resume(args)
     elif args.command == 'rank':

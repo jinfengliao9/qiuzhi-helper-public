@@ -7,20 +7,29 @@ description: "中文求职工作区助手，覆盖简历定制生成、个人资
 
 ## 概述
 
-本 Skill 将求职过程管理为一个有状态、有反馈闭环的工作区，而非一次性的简历生成。核心流程：个人资料初始化（setup）→ 职位匹配评估（rank）→ 定制简历生成（apply）→ 面试准备（interview）→ 结果归档（outcome）→ 网申全流程（campus：信息底座/雷达找岗/机筛检查/OQ生成/半自动填表/进度看板），结果反哺资料，越用越精准。
+本 Skill 将求职过程管理为一个有状态、有反馈闭环的工作区，而非一次性的简历生成。核心流程：个人资料初始化（setup）→ 职位匹配评估（rank）→ 定制简历生成（apply）→ 面试准备（interview）→ 结果归档（outcome）→ 网申全流程（campus：信息底座/雷达找岗/机筛检查/OQ动态生成/半自动填表/进度看板），结果反哺资料，越用越精准。
 
 **第一阶段已实现**：setup（资料初始化）+ apply（简历生成，4种HTML模板+Edge转PDF+Word按需生成）。
 **第二阶段已实现**：rank（职位匹配评估）+ interview（面试准备）+ outcome（申请归档）+ check_resume（简历格式自动检查）。
 **第三阶段已实现（v0.4.0 起四平台：Edge 扩展被动采集）**：在用户本人 Edge 浏览器安装原生扩展（MAIN world，hook 页面自身 fetch/XHR），支持 BOSS直聘/智联招聘/前程无忧三平台，用户正常搜索/翻页时被动累积岗位、一键导出 JSON，AI 侧解析、5维度匹配、出独立报告或入库。已打通 **BOSS直聘 + 智联招聘** 双平台：BOSS 列表明文薪资、可选慢速补全完整 JD；智联列表响应已内嵌完整 JD，无需补详情。旧的 Browser Use（CDP）自动化方案因触发风控/页面跳动/登录死路，**已归档，不再作为主路径**（详见流程六）。
-**第四阶段已实现（v0.5.0 网申模块）**：campus 命令组统一入口，覆盖 ①信息底座（application_profile.json，13块中文key，含身份证/家人，敏感信息只存本地不入Git）②网申雷达（国聘公开API+牛客校招日程，自动采集+合并HTML报告，应届生网第三源暂挂起）③机筛质量检查（apply_check.py，15维度，含国企机筛关键词/身份证校验/附件材料，统一主题HTML报告）④OQ开放性问题生成（8类28题，基于信息底座个性化答案）⑤Edge轻量点填扩展（fill_extension，侧边面板一键填充，只填不提交）⑥进度看板（apply_track.py，8状态机/截止提醒/状态时间线/OQ存档/HTML看板）。统一报告主题 report_theme.py（四套报告统一视觉标准）。
+**第四阶段已实现（v0.5.0 网申模块）**：campus 命令组统一入口，覆盖 ①信息底座（application_profile.json，13块中文key，含身份证/家人，敏感信息只存本地不入Git）②网申雷达【辅助参考】（国聘公开API+牛客校招日程，自动采集+合并HTML报告；主力推荐塔塔网申等专业聚合平台，数据量更大更新更及时）③机筛质量检查（apply_check.py，15维度，含国企机筛关键词/身份证校验/附件材料，统一主题HTML报告）④OQ开放性问题动态生成（AI动态生成+本地知识库记忆，任何问题都能基于信息底座生成个性化答案，越用越聪明，oq_kb.py知识库管理）⑤Edge轻量点填扩展（fill_extension，侧边面板一键填充，只填不提交）⑥进度看板（apply_track.py，8状态机/截止提醒/状态时间线/OQ存档/HTML看板）。统一报告主题 report_theme.py（四套报告统一视觉标准）。
 **规范化整改已完成（阶段0-6）**：
 - **统一工作流引擎**：`job_search.py` 主脚本，整合所有功能，提供13个统一命令（setup/resume/rank/apply/interview/outcome/check/jobs/config/validate/quality/campus/help），其中 campus 命令组含5个子命令（check/radar/oq/profile/track）
 - **数据标准化**：4个JSON Schema（job/resume/match_result/application）+ 轻量级验证工具
 - **配置外置**：`config.yaml` 统一配置文件（10个section）+ 配置加载工具
 - **统一报告主题**：`report_theme.py` 唯一视觉标准（20+纯函数组件），四套报告（岗位采集/岗位库/网申雷达/机筛检查）全部统一主题；旧 templates/report_style.css 已废弃
+- **推荐外部工具【重要】**：网申信息聚合优先使用专业平台——①塔塔网申（tatawangshen.com，累计108万+职位，每日实时更新，129家央企分类，内推码/投递榜/即将截止提醒，配套浏览器插件一键填网申）②校招鸭（xiaozhaoya.com，全网校招信息汇总，多维度筛选）③小罗盘校招网。本skill的网申雷达仅作为辅助参考，主力找岗位用上述专业平台，找到后把JD发给本skill做匹配评估+定制简历+OQ生成+面试准备
 - **质量门禁**：`utils/quality_gate.py` 自动验证和错误处理（4类验证门禁）
 - **SOP文档**：`references/sop/` 11个标准操作流程文档（含SOP-011网申模块SOP）
 - **Git版本管理**：8次提交，完整的变更历史
+**第二轮轻量产品化已完成（v0.6.0）**：
+- **新增 prepare 一键命令**：`python job_search.py prepare --url <岗位URL>`，自动串联5个步骤（抓取JD→匹配评估→生成简历→生成OQ→生成面试题），支持 `--only`（只做指定步骤）和 `--skip`（跳过指定步骤）灵活选择，解决"每次都要临时写脚本"的核心痛点
+- **新增 job_fetcher.py 岗位URL抓取模块**：支持从URL/JD文本/JD文件解析岗位信息，自动识别平台（国聘/智联/BOSS/51job/猎聘），提取15+字段（公司/岗位/薪资/地点/学历/经验/截止时间等），缓存到 applications/00_岗位缓存/ 供后续步骤复用
+- **完善 resume 命令**：增加 `--company`（自动创建公司子文件夹）、`--output`（指定输出目录）、`--data`（指定简历数据文件）参数
+- **完善 interview 命令**：增加 `--jd`（JD文本）、`--jd-file`（JD文件路径）参数，基于JD关键词增强专业技术题
+- **新增 path_config.py 统一路径配置**：所有命令输出路径统一管理，8个分类目录（00_岗位缓存/01_岗位匹配报告/02_简历/03_面试题库/04_岗位采集报告/05_网申模块/99_归档），确保输出不混乱
+- **统一输出路径**：resume输出到 applications/02_简历/{公司}_简历/，interview输出到 applications/03_面试题库/，prepare自动分类存放
+
 **后续阶段规划**：完善文档（阶段7）、测试优化（阶段8）、多平台扩展（前程无忧/猎聘/实习僧，待用户注册账号）、薪资查询、多 agent 审核、求职信生成。
 
 ## 工作区目录结构
@@ -43,10 +52,12 @@ job-search-workspace/
 ├── check_resume.py        ← 简历格式自动检查
 ├── apply_check.py         ← 【v0.5.0】网申机筛质量检查（15维度，含国企关键词/身份证校验）
 ├── apply_track.py         ← 【v0.5.0】网申进度看板（8状态机/截止提醒/时间线/OQ存档）
+├── oq_answers/            ← OQ答案知识库（按公司分目录，AI动态生成的答案自动存档，支持搜索复用）
 ├── report_theme.py        ← 【v0.5.0】统一报告主题（唯一视觉标准，20+函数组件）
-├── oq_generator.py        ← 【v0.5.0】OQ开放性问题答案生成（8类28题）
-├── radar_guopin.py        ← 【v0.5.0】国聘网岗位采集（公开API）
-├── radar_nowcoder.py      ← 【v0.5.0】牛客校招日程采集
+├── oq_generator.py        ← 【v0.5.0】OQ固定题库预生成（高频题基础，保留）
+├── oq_kb.py               ← 【v0.5.1】OQ知识库管理器（list/search/show/add/export/stats，AI动态生成答案的本地记忆）
+├── radar_guopin.py        ← 【v0.5.0】国聘网岗位采集（公开API，辅助参考）
+├── radar_nowcoder.py      ← 【v0.5.0】牛客校招日程采集（辅助参考）
 ├── radar_merged_report.py ← 【v0.5.0】网申雷达合并报告生成
 ├── gen_fill_extension.py  ← 【v0.5.0】Edge点填扩展生成器
 ├── fill_extension/        ← 【v0.5.0】Edge轻量点填扩展（加载到Edge，只填不提交）
@@ -55,6 +66,9 @@ job-search-workspace/
 ├── report_generator.py    ← 统一报告生成器（标准化数据+统一样式）
 ├── job_pipeline.py        ← 岗位处理流水线（导入→匹配→报告）
 ├── jd_parser.py           ← JD详情解析（旧时代文件，活跃复用：详情文本拆分职责/要求）
+├── job_fetcher.py         ← 【v0.6.0】岗位URL抓取模块（URL/JD文本解析，15+字段提取，缓存复用）
+├── prepare_pipeline.py    ← 【v0.6.0】岗位一键处理流水线（5步骤串联，--only/--skip灵活选择）
+├── path_config.py         ← 【v0.6.0】统一路径配置（8个分类目录，所有命令输出路径统一管理）
 ├── filter_jobs.py         ← 本地筛选模块（9维度筛选）
 ├── job_collector.py       ← 岗位库管理（旧时代文件，活跃复用：JobCollector DAL，被job_pipeline/filter_jobs依赖）
 ├── boss_api/               ← 【v0.2.0 主路径】Edge扩展被动采集 + 解析 + 独立报告
